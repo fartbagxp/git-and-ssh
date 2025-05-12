@@ -1,1 +1,4 @@
 site_name: git-and-ssh
+site_url: https://fartbagxp.github.io/git-and-ssh/
+theme:
+  name: material
