@@ -36,5 +36,5 @@ jobs:
           restore-keys: |
             mkdocs-material-
 
-      - run: uv add mkdocs-material
+      - run: uv sync
       - run: mkdocs gh-deploy --force

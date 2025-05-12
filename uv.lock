@@ -122,8 +122,16 @@ dependencies = [
     { name = "mkdocs-material" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "mkdocs" },
+]
+
 [package.metadata]
 requires-dist = [{ name = "mkdocs-material", specifier = ">=9.6.13" }]
+
+[package.metadata.requires-dev]
+dev = [{ name = "mkdocs", specifier = ">=1.6.1" }]
 
 [[package]]
 name = "idna"
