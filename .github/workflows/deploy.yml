@@ -37,4 +37,4 @@ jobs:
             mkdocs-material-
 
       - run: uv sync
-      - run: mkdocs gh-deploy --force
+      - run: uv run mkdocs gh-deploy --force
