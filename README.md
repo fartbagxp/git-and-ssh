@@ -12,6 +12,15 @@ source .venv/bin/activate
 uv sync --all-extras --dev
 ```
 
+To run the [mkdocs](https://www.mkdocs.org/) application,
+
+```bash
+uv run mkdocs build
+uv run mkdocs serve
+```
+
+and navigate to [http://127.0.0.1:8000/git-and-ssh/](http://127.0.0.1:8000/git-and-ssh/) for the latest updates.
+
 To add a new dependency, like mkdocs-material, run this:
 
 ```bash
