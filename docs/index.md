@@ -48,3 +48,25 @@ email = tpz7@cdc.gov
 SSH Configurations are
 
 ## Automate Cloning and Pulls
+
+`clone.sh` to clone a number of repositories into a folder.
+
+Notice that git@`github.com-fartbagxp` matches our [SSH configuration above](#ssh-configurations) to associate a Git user with a Git server via SSH. The [SSH configuration](#ssh-configurations) binds the Git association together.
+
+```bash
+#!/usr/bin/env bash
+git clone git@github.com-fartbagxp:fartbagxp/aas-cidr-ranges.git
+git clone git@github.com-fartbagxp:fartbagxp/asdf-dolt.git
+git clone git@github.com-fartbagxp:fartbagxp/asdf-oauth2c.git
+```
+
+`pull.sh` to update all repositories in a folder.
+
+```bash
+#!/usr/bin/env bash
+
+for d in */ ; do
+  echo $d
+  git -C $d pull
+done
+```
