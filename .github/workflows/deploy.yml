@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - "main"
+  pull_request:
 
 jobs:
   deploy:
@@ -41,5 +42,9 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Build documentation
+        run: uv run mkdocs build
+
       - name: Build and deploy documentation
+        if: github.ref == 'refs/heads/main'
         run: uv run mkdocs gh-deploy --force
