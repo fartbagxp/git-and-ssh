@@ -130,7 +130,7 @@ SSH Configurations determines what SSH keypair and identity to use when a Git cl
 
 The SSH configuration is a single file `config` in the directory path `~/.ssh/config`.
 
-I modify the config file to target a specific HostName (ex. github.com) to use a particular User (ex. git) and prefer to use the authentication method of publickey instead of password and select the SSH private key path as the IdentityFile. The config file can include numerous SSH configurations for the different Hosts (ex. Github, Gitlab, Bitbucket) to target.
+I modify the config file to target a specific HostName (ex. github.com, gitlab.com) to use a particular User (ex. git) and prefer to use the authentication method of publickey instead of password and select the SSH private key path as the IdentityFile. The config file can include numerous SSH configurations for the different Hosts (ex. Github, Gitlab, Bitbucket) to target.
 
 ```bash
 Host github.com-org1
@@ -146,22 +146,39 @@ Host github.com-org2
   PreferredAuthentications publickey
   IdentityFile ~/.ssh/git/github_org2_ed25519
   IdentitiesOnly yes
+
+Host gitlab.com-org1
+  HostName gitlab.com
+  User git
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/git/gitlab_org1_ed25519
+  IdentitiesOnly yes
 ```
 
 ## Automate Cloning and Pulls
 
 `clone.sh` to clone a number of repositories into a folder.
 
-Notice that git@`github.com-fartbagxp` matches our [SSH configuration above](#ssh-configurations) to associate a Git user with a Git server via SSH. The [SSH configuration](#ssh-configurations) binds the Git association together.
+!!! note
+
+    Notice below that git@**github.com-org1** matches our [HostName field in the SSH configuration](#ssh-configurations) so that the Git client can associate a Git user with a Git server. The [SSH configuration](#ssh-configurations) binds the Git association together, to select a particular Git user with a particular SSH key for a particular Git server target.
 
 ```bash
 #!/usr/bin/env bash
 git clone git@github.com-org1:fartbagxp/aas-cidr-ranges.git
-git clone git@github.com-org1:fartbagxp/asdf-dolt.git
+git clone git@github.com-org1:fartbagxp/aas-cidr-ranges.git
 git clone git@github.com-org1:fartbagxp/asdf-oauth2c.git
 ```
 
-`pull.sh` to update all repositories in a folder.
+Following the [folder structure](#organize-folder-structure) we setup, we may have another `clone.sh` script for another organization and the configuration binds the Git user, the unique SSH key, and the Git server target together.
+
+```bash
+#!/usr/bin/env bash
+git clone git@gitlab.com-org1:dwt1/dotfiles.git
+git clone git@gitlab.com-org1:wireshark/wireshark.git
+```
+
+(Optional) To sync repositories without verifying, `pull.sh` updates all repositories in a folder. This will cause git conflicts if there are unmerged changes!
 
 ```bash
 #!/usr/bin/env bash
