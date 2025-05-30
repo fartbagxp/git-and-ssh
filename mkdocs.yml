@@ -6,6 +6,7 @@ theme:
   language: en
   features:
     - search.suggest
+    - content.code.copy
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -25,4 +26,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
   - pymdownx.superfences
