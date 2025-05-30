@@ -68,10 +68,12 @@ Next, we include an `includeIf` clause to point at each of the [folder structure
   path = .gitconfig-org1
 [includeIf "gitdir:~/code/org2/"]
   path = .gitconfig-org2
-[includeIf "gitdir:~/code/github-org3/"]
-  path = .gitconfig-github-org3
-[includeIf "gitdir:~/code/gitlab-org4/"]
-  path = .gitconfig-org4
+[includeIf "gitdir:~/code/github-org1/"]
+  path = .gitconfig-github-org1
+[includeIf "gitdir:~/code/github-org2/"]
+  path = .gitconfig-github-org2
+[includeIf "gitdir:~/code/gitlab-org1/"]
+  path = .gitconfig-org1
 [core]
   attributesfile = .gitattributes
 ```
