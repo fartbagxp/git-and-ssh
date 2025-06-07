@@ -168,7 +168,7 @@ Host gitlab.com-org1
 ```bash
 #!/usr/bin/env bash
 git clone git@github.com-org1:fartbagxp/aas-cidr-ranges.git
-git clone git@github.com-org1:fartbagxp/aas-cidr-ranges.git
+git clone git@github.com-org1:fartbagxp/git-and-ssh.git
 git clone git@github.com-org1:fartbagxp/asdf-oauth2c.git
 ```
 
