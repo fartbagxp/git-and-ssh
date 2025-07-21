@@ -191,57 +191,57 @@ for d in */ ; do
 done
 ```
 
-## Miscalleous Tricks
+## Miscellaneous Tricks
 
-There are often tricky scenarios when trying to clone or push a project to a Git server based on what how our clients connect to the server (sometimes crossing intermediate firewalls) for the first time.
+There are often tricky scenarios when trying to clone or push a project to a Git server based on how our clients connect to the server (sometimes crossing intermediate firewalls) for the first time.
 
 These are some debugging tips whether using SSH or HTTPS to connect to the Git server.
 
 ### Debugging SSH on Git
 
-When using Git as a client to connect to a server via the SSH protocol, the default `git clone <repository>` does not offer any helpful debugging messages when a failure happens due to the SSH connection.
+When using Git as a client to connect to a server via the SSH protocol, the default `git clone <repository>` does not offer any helpful debugging messages when a failure happens because of the SSH connection.
 
-To enable debugging messages, we can prepend an environment variable **GIT_SSH_COMMAND** before running git clone.
+To enable debugging messages, we can prepend the environment variable **GIT_SSH_COMMAND** before running git clone.
 
 ```bash
-GIT_SSH_COMMAND="ssh -v" git clone git@github.com:github/training-kit.git
+GIT_SSH_COMMAND=“ssh -v” git clone git@github.com:github/training-kit.git
 ```
 
 For more verbose output -
 
 ```bash
-GIT_SSH_COMMAND="ssh -vvv" git clone git@github.com:github/training-kit.git
+GIT_SSH_COMMAND=“ssh -vvv” git clone git@github.com:github/training-kit.git
 ```
 
 ### Debugging HTTPS on Git
 
-If for some reason the Git server or some intermediate firewall blocks SSH connections to the Git server, we have to rely on the HTTPS protocol to connect to it.
+If the Git server or some intermediate firewall blocks SSH connections to the Git server, we have to rely on the HTTPS protocol to connect to it.
 
-Use `nc` and `curl` as a tool first to determine connectivity.
+Use `nc` and `curl` as tools first to determine connectivity.
 
-To test whether you can establish a TCP based connection to the Git server, on the standard SSH port 22:
+To test whether you can establish a TCP-based connection to the Git server on the standard SSH port 22:
 
 ```bash
 nc -vz -w 3 github.com 22
 ```
 
-If the output indicates that the connection failed and your regular internet is working, it is likely an intermediate firewall somewhere is blocking your connection or that the Git server doesn't want to establish a connection over SSH with you.
+If the output shows that the connection failed and your regular internet is working, it is likely an intermediate firewall somewhere is blocking your connection or that the Git server doesn’t want to establish a connection over SSH with you.
 
-Alternately, run a curl connection to test HTTPs
+Alternately, run a curl connection to test https
 
 ```bash
 curl -vv https://github.com
 ```
 
-A wall of text should appear to fetch the website, indicating success. Otherwise, if the connection fails or hangs, it indicates a failure and there's nothing more we can do.
+A wall of text should appear to fetch the website, showing success. Otherwise, if the connection fails or hangs, it shows a failure, and there’s nothing more we can do.
 
-If it was successful, we can then use git to clone a repository over https.
+If it is successful, we can then use git to clone a repository over https.
 
 ```bash
 git clone https://username@github.com/username/repository.git
 ```
 
-Alternately, if you prefer using your password directly in a less secure fashion (as the password is exposed in a saved command line prompt)...
+Alternatively, if you prefer using your password directly in a less secure fashion - where we expose the password in the command line storing history
 
 ```bash
 git clone https://username:password@github.com/username/repository.git
