@@ -190,3 +190,77 @@ for d in */ ; do
   git -C $d pull
 done
 ```
+
+## Miscellaneous Tricks
+
+There are often tricky scenarios when trying to clone or push a project to a Git server based on how our clients connect to the server (sometimes crossing intermediate firewalls) for the first time.
+
+These are some debugging tips whether using SSH or HTTPS to connect to the Git server.
+
+### Debugging SSH on Git
+
+When using Git as a client to connect to a server via the SSH protocol, the default `git clone <repository>` does not offer any helpful debugging messages when a failure happens because of the SSH connection.
+
+To enable debugging messages, we can prepend the environment variable **GIT_SSH_COMMAND** before running git clone.
+
+```bash
+GIT_SSH_COMMAND=“ssh -v” git clone git@github.com:github/training-kit.git
+```
+
+For more verbose output -
+
+```bash
+GIT_SSH_COMMAND=“ssh -vvv” git clone git@github.com:github/training-kit.git
+```
+
+### Debugging HTTPS on Git
+
+If the Git server or some intermediate firewall blocks SSH connections to the Git server, we have to rely on the HTTPS protocol to connect to it.
+
+Use `nc` and `curl` as tools first to determine connectivity.
+
+To test whether you can establish a TCP-based connection to the Git server on the standard SSH port 22:
+
+```bash
+nc -vz -w 3 github.com 22
+```
+
+If the output shows that the connection failed and your regular internet is working, it is likely an intermediate firewall somewhere is blocking your connection or that the Git server doesn’t want to establish a connection over SSH with you.
+
+Alternately, run a curl connection to test https
+
+```bash
+curl -vv https://github.com
+```
+
+A wall of text should appear to fetch the website, showing success. Otherwise, if the connection fails or hangs, it shows a failure, and there’s nothing more we can do.
+
+If it is successful, we can then use git to clone a repository over https.
+
+```bash
+git clone https://username@github.com/username/repository.git
+```
+
+Alternatively, if you prefer using your password directly in a less secure fashion - where we expose the password in the command line storing history
+
+```bash
+git clone https://username:password@github.com/username/repository.git
+```
+
+A third way to clone is to use a [Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) common among many Git based servers.
+
+```bash
+git clone https://*token*@github.com/username/repository.git
+```
+
+### SOCKS Proxy with Git
+
+A [SOCKS Proxy](https://fartbagxp.github.io/ssh-proxy-traffic/ssh-proxy/proxy-with-socks) is useful to get around firewall or network blockage of a HTTPS connection to the Git server.
+
+Once we established [a SOCKS Proxy](https://fartbagxp.github.io/ssh-proxy-traffic/ssh-proxy/proxy-with-socks), we can run the following to run git clone command, proxying the HTTPS connection to a SOCKS proxy.
+
+This example uses the `127.0.0.1` (localhost) as the connection point of the SOCKS proxy and 8055 as the port of the proxy.
+
+```bash
+ALL_PROXY=socks5h://127.0.0.1:8055 git clone https://username@github.com/username/repository.git
+```
