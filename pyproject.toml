@@ -1,15 +1,15 @@
 [project]
 name = "git-and-ssh"
-version = "0.1.0"
+version = "1.0.0"
 description = "A simple guide to using Git and SSH"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "mkdocs-material>=9.6.13",
+    "mkdocs-material>=9.6.21",
 ]
 
 [dependency-groups]
 dev = [
     "mkdocs>=1.6.1",
-    "pre-commit>=4.2.0",
+    "pre-commit>=4.3.0",
 ]
