@@ -5,7 +5,7 @@ description = "A simple guide to using Git and SSH"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "mkdocs-material>=9.6.21",
+    "mkdocs-material>=9.6.22",
 ]
 
 [dependency-groups]
