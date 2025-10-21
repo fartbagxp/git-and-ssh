@@ -39,12 +39,6 @@ To add a new dependency to a group like a lint group to segment dependencies, ru
 uv add --group lint ruff
 ```
 
-To run the code from main.py, run it via uv environment.
-
-```bash
-uv run main.py data/raw
-```
-
 To exit out of the virtual environment (venv), run the following:
 
 ```bash
