@@ -13,6 +13,6 @@ View [Contributing.md](.github/CONTRIBUTING.md) for more on development.
 Use [uv](https://docs.astral.sh/uv/) and run the following to host [the site locally](http://127.0.0.1:8000/git-and-ssh/):
 
 ```bash
-uv run mkdocs build
-uv run mkdocs serve
+uv run zensical build
+uv run zensical serve
 ```
