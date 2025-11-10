@@ -16,13 +16,13 @@ Install the pre-commit hooks:
 pre-commit install
 ```
 
-Run mkdocs:
+Run mkdocs/zensical:
 
-To run the [mkdocs](https://www.mkdocs.org/) application,
+To run the [mkdocs/zensical](https://zensical.org/docs/get-started/) application,
 
 ```bash
-uv run mkdocs build
-uv run mkdocs serve
+uv run zensical build
+uv run zensical serve
 ```
 
 and navigate to [http://127.0.0.1:8000/git-and-ssh/](http://127.0.0.1:8000/git-and-ssh/) for the latest updates.
