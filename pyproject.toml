@@ -3,10 +3,10 @@ name = "git-and-ssh"
 version = "1.0.0"
 description = "A simple guide to using Git and SSH"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "mkdocs-material>=9.6.22",
-    "zensical>=0.0.10",
+    "zensical>=0.0.19",
 ]
 
 [dependency-groups]
