@@ -2,10 +2,14 @@ version: 2
 updates:
   - package-ecosystem: uv
     directory: /
+    groups:
+      uv-deps:
+        patterns:
+          - "*"
     schedule:
       interval: monthly
     cooldown:
-      default-days: 7
+      default-days: 14
   - package-ecosystem: github-actions
     directory: /
     groups:
@@ -15,4 +19,4 @@ updates:
     schedule:
       interval: monthly
     cooldown:
-      default-days: 7
+      default-days: 14
