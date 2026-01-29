@@ -1,30 +1,30 @@
 # Git and SSH
 
-When using [Git](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) with [Secure Shell (SSH)](https://www.cloudflare.com/learning/access-management/what-is-ssh/) to connect from a Git client to a Git server, these are the tricks to handle multiple Github/Gitlab accounts to connect to multiple Github/Gitlab servers.
+When using [Git](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) with [SSH](https://www.cloudflare.com/learning/access-management/what-is-ssh/) to connect a Git client to a Git server, these are the tricks to handle multiple Github/Gitlab accounts and servers.
 
-This spawns out of a necessity to manage a chaotic environment with
+I wrote this because I got tired of managing a chaotic environment with
 
-1. numerous Git (ex. Github, Gitlab, Bitbucket) accounts,
-1. many SSH keys associated with different identities,
+1. numerous Git accounts (Github, Gitlab, Bitbucket),
+1. many SSH keys tied to different identities,
 1. and many different Git servers to connect to.
 
-This guide assumes you're in a Unix/Linux environment or a Linux like environment such as [cygwin](https://www.cygwin.com/).
+This guide assumes you're in a Unix/Linux environment or something like [cygwin](https://www.cygwin.com/).
 
 ## Overview
 
-1. [Separate folders](#organize-folder-structure) when cloning a different Git account user's repository to ensure we don't mix and match two different user handles when working on a repository.
-1. [Separate .gitconfig files](#git-config-identity) to separate Git identity - name and email separation for selective folders.
-1. [Separate SSH keys](#ssh-keys) for identity management when identifying as a Git user to connect to a Git server.
-1. [Separate SSH Configuration](#ssh-configurations) as a configuration to connect to different Git servers using different Git users.
-1. (Optional) [Automate cloning and pulls](#automate-cloning-and-pulls) so that we have a history of what's in the folders.
+1. [Separate folders](#organize-folder-structure) when cloning repos so you don't mix up user handles across accounts.
+1. [Separate .gitconfig files](#git-config-identity) to set different Git identities (name, email) per folder.
+1. [Separate SSH keys](#ssh-keys) for authenticating as different Git users.
+1. [Separate SSH configuration](#ssh-configurations) to route connections to different Git servers with different keys.
+1. (Optional) [Automate cloning and pulls](#automate-cloning-and-pulls) to keep a record of what's in each folder.
 
-## Organize Folder Structure
+## Organize folder structure
 
-I favor creating a single `code` folder for all code related artifacts. Within the folder, I create subfolders aligned to Git servers and Git profiles I intend to associate with. For example, image `user1` is the name of the user.
+I keep a single `code` folder for all code. Inside it, I create subfolders matching the Git servers and profiles I use. For example, say `user1` is the username.
 
-We can have multiple folder representing different organizations and projects underneath. Each **organization** tends to associate with a Git server (ex. Github, Gitlab, etc) or an organization within Github or Gitlab (ex. [https://github.com/google](https://github.com/google)). Each **project** underneath is a Git repository.
+You can have multiple folders for different organizations and projects. Each **organization** maps to a Git server (Github, Gitlab, etc.) or an organization within one (like [https://github.com/google](https://github.com/google)). Each **project** underneath is a Git repository.
 
-Once we organize our folder structure in this manner, we can setup [Git identity](#git-config-identity) to associate our Git identity (username, email) to each of the organization folders.
+Once the folders are set up, you can configure [Git identity](#git-config-identity) to tie your username and email to each organization folder.
 
 ```bash
 /home/user1/code
@@ -41,27 +41,26 @@ Once we organize our folder structure in this manner, we can setup [Git identity
 │ ├── projectb
 ```
 
-## Git Config Identity
+## Git config identity
 
-Most people set their Git identity manually using the command line once globally because Git commits requires it. Git server providers such as GitHub also [verifies Git commit via Git config email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#about-commit-email-addresses) to put a Verified badge on the commit.
+Most people set their Git identity once, globally, because Git commits require it. Git servers like GitHub also [verify commits via the config email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#about-commit-email-addresses) to show a Verified badge.
 
-The most common way done manually is via the command line:
+The usual way is via the command line:
 
 ```bash
-# To set your name and email address globally, use the following commands in your terminal:
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 ```
 
 !!! note
 
-    GitHub recommends using [a noreply email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#about-no-reply-email) they provide to avoid getting spammed by soliciters seeking to profit off your Git commit emails.
+    GitHub recommends using [a noreply email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#about-no-reply-email) they provide so spammers can't harvest your commit email.
 
-To automate `git config` across the [folder structure](#organize-folder-structure) setup previously, we create a [gitconfig file](https://git-scm.com/book/ms/v2/Getting-Started-First-Time-Git-Setup) that is stored the root of our directory. This file has no file extension and is a simple text file.
+To automate `git config` across the [folder structure](#organize-folder-structure) from earlier, create a [gitconfig file](https://git-scm.com/book/ms/v2/Getting-Started-First-Time-Git-Setup) at the root of your home directory. It has no file extension -- just a plain text file.
 
-For example, my .gitconfig file is located at `~/.gitconfig` or `/home/user1/.gitconfig`.
+For example, my .gitconfig file is at `~/.gitconfig` or `/home/user1/.gitconfig`.
 
-Next, we include an `includeIf` clause to point at each of the [folder structure](#organize-folder-structure) created earlier, the path after `gitdir:` must end in `/` to represent a directory. This instructs Git that when looking in the path of `~/code/org/`, to use the configuration specified in the path, `.gitconfig-org1`.
+Then add `includeIf` clauses pointing at each folder. The path after `gitdir:` must end in `/` to match a directory. This tells Git: when working inside `~/code/org1/`, use the config file `.gitconfig-org1`.
 
 ```toml
 [includeIf "gitdir:~/code/org1/"]
@@ -78,11 +77,11 @@ Next, we include an `includeIf` clause to point at each of the [folder structure
   attributesfile = .gitattributes
 ```
 
-The `.gitconfig-org1` file includes a configuration of the user's name and email address.
+The `.gitconfig-org1` file just has the user's name and email:
 
 !!! note
 
-    If you decide to keep your email private for [Github](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#about-commit-email-addresses), go to [Github email settings](https://github.com/settings/emails) and navigate to the section of the Github provided email you should use.
+    If you want to keep your email private on [Github](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address#about-commit-email-addresses), go to [Github email settings](https://github.com/settings/emails) and find the noreply address they give you.
 
 ```toml
 [user]
@@ -90,49 +89,49 @@ name = "user1"
 email = 1234556+user1@users.noreply.github.com
 ```
 
-## SSH Keys
+## SSH keys
 
-SSH Keys serves as another way other than passwords for a SSH client to authenticate to a SSH server. Typing in passwords to login every time is rather annoying. The security tradeoffs [are often debated](https://serverfault.com/a/334478) between using passwords and using SSH keys for authentication.
+SSH keys are an alternative to passwords for authenticating to an SSH server. Typing passwords every time is annoying, and the security tradeoffs between passwords and keys [are debated](https://serverfault.com/a/334478).
 
-To generate SSH keypairs of public and private key as a client, I prefer ED25519 based keys, as they're faster and smaller than RSA based keys.
+To generate an SSH keypair, I prefer ED25519 keys -- they're faster and smaller than RSA keys.
 
 ```bash
 ssh-keygen -t ed25519 -o -a 100 -C "email@example.com" -f ~/.ssh/example_network_id_ed25519
 ```
 
-Otherwise, to generate a RSA 4096 bits keypair:
+Otherwise, to generate an RSA 4096-bit keypair:
 
 !!! note
 
-    RSA 2048 bit keys are still widely in use until [standards phases it out in 2030](https://keylength.com). It is about [4x faster than RSA 4096 bit keys to use](https://www.fastly.com/blog/key-size-for-tls) while RSA 4096 bit keys [have slightly better encryption strength](https://crypto.stackexchange.com/questions/1978/how-big-an-rsa-key-is-considered-secure-today).
+    RSA 2048-bit keys are still widely used until [standards phase them out in 2030](https://keylength.com). They're about [4x faster than RSA 4096-bit keys](https://www.fastly.com/blog/key-size-for-tls), while 4096-bit keys offer [slightly better encryption strength](https://crypto.stackexchange.com/questions/1978/how-big-an-rsa-key-is-considered-secure-today).
 
 ```bash
 ssh-keygen -t rsa -b 4096 -C "email@example.com" -f ~/.ssh/example_network_id_rsa
 ```
 
-(Optional) You may choose to add a passphrase for extra security and to avoid having to type the password again, it's best to have it cached once with an SSH agent.
+(Optional) You can add a passphrase for extra security. To avoid retyping it, cache it with an SSH agent.
 
-To run SSH agent, run the following:
+To start the SSH agent:
 
 ```bash
 eval "$(ssh-agent -s)"
 ```
 
-(Optional) Add your SSH key to the SSH agent.
+(Optional) Add your SSH key to the agent:
 
 ```bash
 ssh-add ~/.ssh/example_network_id_ed25519
 ```
 
-The SSH convention for keys is that the private key file has no extensions while the public key file has a **.pub** extension.
+By convention, the private key file has no extension and the public key file ends in **.pub**.
 
-## SSH Configurations
+## SSH configurations
 
-SSH Configurations determines what SSH keypair and identity to use when a Git client tries to connect to a Git server; it binds the usage of the keypair with the SSH client's identity when connecting to a Git server listening for SSH connections.
+The SSH config file determines which keypair and identity to use when connecting to a Git server. It binds a specific key to a specific host.
 
-The SSH configuration is a single file `config` in the directory path `~/.ssh/config`.
+The config file lives at `~/.ssh/config`.
 
-I modify the config file to target a specific HostName (ex. github.com, gitlab.com) to use a particular User (ex. git) and prefer to use the authentication method of publickey instead of password and select the SSH private key path as the IdentityFile. The config file can include numerous SSH configurations for the different Hosts (ex. Github, Gitlab, Bitbucket) to target.
+I set each Host entry to target a specific HostName (github.com, gitlab.com), use `git` as the User, prefer publickey authentication, and point IdentityFile at the right private key. You can have as many Host entries as you need.
 
 ```bash
 Host github.com-org1
@@ -157,13 +156,13 @@ Host gitlab.com-org1
   IdentitiesOnly yes
 ```
 
-## Automate Cloning and Pulls
+## Automate cloning and pulls
 
-`clone.sh` to clone a number of repositories into a folder.
+`clone.sh` clones a list of repositories into a folder.
 
 !!! note
 
-    Notice below that git@**github.com-org1** matches our [HostName field in the SSH configuration](#ssh-configurations) so that the Git client can associate a Git user with a Git server. The [SSH configuration](#ssh-configurations) binds the Git association together, to select a particular Git user with a particular SSH key for a particular Git server target.
+    Notice that git@**github.com-org1** matches the [Host field in the SSH config](#ssh-configurations). This is how the Git client knows which SSH key to use for which server. The SSH config ties the Git user, the SSH key, and the Git server together.
 
 ```bash
 #!/usr/bin/env bash
@@ -172,7 +171,7 @@ git clone git@github.com-org1:fartbagxp/git-and-ssh.git
 git clone git@github.com-org1:fartbagxp/asdf-oauth2c.git
 ```
 
-Following the [folder structure](#organize-folder-structure) we setup, we may have another `clone.sh` script for another organization and the configuration binds the Git user, the unique SSH key, and the Git server target together.
+Following the [folder structure](#organize-folder-structure), you might have another `clone.sh` for a different organization:
 
 ```bash
 #!/usr/bin/env bash
@@ -180,7 +179,7 @@ git clone git@gitlab.com-org1:dwt1/dotfiles.git
 git clone git@gitlab.com-org1:wireshark/wireshark.git
 ```
 
-(Optional) To sync repositories without verifying, `pull.sh` updates all repositories in a folder. This will cause git conflicts if there are unmerged changes!
+(Optional) To pull all repos in a folder, `pull.sh` updates everything. This will cause conflicts if there are unmerged changes!
 
 ```bash
 #!/usr/bin/env bash
@@ -191,75 +190,73 @@ for d in */ ; do
 done
 ```
 
-## Miscellaneous Tricks
+## Miscellaneous tricks
 
-There are often tricky scenarios when trying to clone or push a project to a Git server based on how our clients connect to the server (sometimes crossing intermediate firewalls) for the first time.
+Cloning or pushing to a Git server can get tricky depending on how your client connects (sometimes through firewalls) for the first time.
 
-These are some debugging tips whether using SSH or HTTPS to connect to the Git server.
+Here are some debugging tips for both SSH and HTTPS connections.
 
 ### Debugging SSH on Git
 
-When using Git as a client to connect to a server via the SSH protocol, the default `git clone <repository>` does not offer any helpful debugging messages when a failure happens because of the SSH connection.
+The default `git clone <repository>` doesn't show useful error messages when SSH connections fail.
 
-To enable debugging messages, we can prepend the environment variable **GIT_SSH_COMMAND** before running git clone.
+To get debug output, prepend **GIT_SSH_COMMAND**:
 
 ```bash
-GIT_SSH_COMMAND=“ssh -v” git clone git@github.com:github/training-kit.git
+GIT_SSH_COMMAND="ssh -v" git clone git@github.com:github/training-kit.git
 ```
 
-For more verbose output -
+For even more detail:
 
 ```bash
-GIT_SSH_COMMAND=“ssh -vvv” git clone git@github.com:github/training-kit.git
+GIT_SSH_COMMAND="ssh -vvv" git clone git@github.com:github/training-kit.git
 ```
 
 ### Debugging HTTPS on Git
 
-If the Git server or some intermediate firewall blocks SSH connections to the Git server, we have to rely on the HTTPS protocol to connect to it.
+If the Git server or a firewall blocks SSH, you'll need to use HTTPS instead.
 
-Use `nc` and `curl` as tools first to determine connectivity.
+Use `nc` and `curl` first to check connectivity.
 
-To test whether you can establish a TCP-based connection to the Git server on the standard SSH port 22:
+Test whether you can reach the Git server on SSH port 22:
 
 ```bash
 nc -vz -w 3 github.com 22
 ```
 
-If the output shows that the connection failed and your regular internet is working, it is likely an intermediate firewall somewhere is blocking your connection or that the Git server doesn’t want to establish a connection over SSH with you.
+If this fails and your internet works otherwise, a firewall is probably blocking SSH, or the server won't accept SSH connections from you.
 
-Alternately, run a curl connection to test https
+Test HTTPS connectivity:
 
 ```bash
 curl -vv https://github.com
 ```
 
-A wall of text should appear to fetch the website, showing success. Otherwise, if the connection fails or hangs, it shows a failure, and there’s nothing more we can do.
+You should see a wall of HTML fetched from the site. If it fails or hangs, something is blocking HTTPS too, and there's not much else to try.
 
-If it is successful, we can then use git to clone a repository over https.
+If HTTPS works, clone over it:
 
 ```bash
 git clone https://username@github.com/username/repository.git
 ```
 
-Alternatively, if you prefer using your password directly in a less secure fashion - where we expose the password in the command line storing history
+You can also inline the password (less secure -- it gets stored in shell history):
 
 ```bash
 git clone https://username:password@github.com/username/repository.git
 ```
 
-A third way to clone is to use a [Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) common among many Git based servers.
+A third option is a [Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic), which most Git servers support:
 
 ```bash
 git clone https://*token*@github.com/username/repository.git
 ```
 
-### SOCKS Proxy with Git
+### SOCKS proxy with Git
 
-A [SOCKS Proxy](https://fartbagxp.github.io/ssh-proxy-traffic/ssh-proxy/proxy-with-socks) is useful to get around firewall or network blockage of a HTTPS connection to the Git server.
+A [SOCKS proxy](https://fartbagxp.github.io/ssh-proxy-traffic/ssh-proxy/proxy-with-socks) can get around firewalls blocking HTTPS to the Git server.
 
-Once we established [a SOCKS Proxy](https://fartbagxp.github.io/ssh-proxy-traffic/ssh-proxy/proxy-with-socks), we can run the following to run git clone command, proxying the HTTPS connection to a SOCKS proxy.
-
-This example uses the `127.0.0.1` (localhost) as the connection point of the SOCKS proxy and 8055 as the port of the proxy.
+Once you have [a SOCKS proxy running](https://fartbagxp.github.io/ssh-proxy-traffic/ssh-proxy/proxy-with-socks), clone through it like this. This example uses `127.0.0.1` (localhost) on port 8055:
 
 ```bash
 ALL_PROXY=socks5h://127.0.0.1:8055 git clone https://username@github.com/username/repository.git
