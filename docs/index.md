@@ -125,6 +125,57 @@ ssh-add ~/.ssh/example_network_id_ed25519
 
 By convention, the private key file has no extension and the public key file ends in **.pub**.
 
+### Post-Quantum SSH Key Exchange
+
+It is becoming more likely that we'll see quantum computing emerge in our lifetime, which changes the game for protecting sessions and authentication.
+
+Google [recently pushed](https://blog.google/innovation-and-ai/technology/safety-security/cryptography-migration-timeline/) to migrate to post-quantum cryptography by 2029, and Cloudflare [quickly set the same target](https://blog.cloudflare.com/post-quantum-roadmap/).
+
+In the SSH protocol, NIST published [FIPS-203 (ML-KEM)](https://csrc.nist.gov/pubs/fips/203/final) in 2024 on a set of post-quantum key exchange algorithms that claim to protect sessions from post-quantum attacks, attacks that could capture session information and post-process it at a later time.
+
+The SSH protocol has two separate cryptographic layers: the authentication key (what we generate with ssh-keygen and upload to GitHub for identifying us) and the key exchange (KEX) algorithm (what negotiates the session encryption secret). The [FIPS-203 (ML-KEM)](https://csrc.nist.gov/pubs/fips/203/final) published in 2024 claims to protect the key exchange (KEX) layer, not the authentication key from quantum-based attacks. Our ed25519 authentication key stays the same while the quantum protection is on the session.
+
+[OpenSSH](https://www.openssh.org/), the most used SSH tool, began supporting post-quantum algorithms such as **sntrup** and **mlkem** as of 9.0+ and 9.9+, respectively.
+
+We can check our OpenSSH version and available post quantum algorithms in the following way:
+
+```bash
+ssh -V
+# Need 9.9+ for mlkem768x25519-sha256
+# Need 9.0+ for sntrup761x25519-sha512
+
+ssh -Q kex | grep -E "(mlkem|sntrup)"
+```
+
+We can also find out what is being negotiated with a Github.com server when running an SSH session:
+
+```bash
+ssh -v git@github.com exit 2>&1 | grep 'kex: algorithm:'
+```
+
+If we would like to force particular key exchange (KEX) algorithms as part of our SSH configuration, we can specify the `KexAlgorithms` field in this manner:
+
+!!! note
+
+    Make sure the SSH version supports the KexAlgorithms below before blindly using it.
+    If OpenSSH's version is below 9.9, these algorithms might not be available.
+
+```bash
+Host github.com-org1
+  HostName github.com
+  User git
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/git/github_org1_ed25519
+  IdentitiesOnly yes
+  KexAlgorithms mlkem768x25519-sha256,sntrup761x25519-sha512@openssh.com
+```
+
+To verify this is working properly, run a SSH session (matching `-org1` from SSH config to `-org1` as the ssh target below) to Github, and it should be one of the listed key exchange (KEX) algorithms above.
+
+```bash
+ssh -v git@github.com-org1 exit 2>&1 | grep 'kex: algorithm:'
+```
+
 ## SSH configurations
 
 The SSH config file determines which keypair and identity to use when connecting to a Git server. It binds a specific key to a specific host.
